@@ -164,11 +164,16 @@ export default function Landing() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {EVENT_DATA.featuring.map((item, i) => (
             <div key={i} style={{
-              display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px',
+              display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px',
               background: 'rgba(147,51,234,0.05)', borderRadius: 10,
               border: '1px solid rgba(147,51,234,0.12)'
             }}>
-              <span style={{ color: 'var(--gold-bright)', fontSize: 18, flexShrink: 0 }}>★</span>
+              <div style={{
+                width: 32, height: 32, borderRadius: 8, flexShrink: 0,
+                background: 'rgba(147,51,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center'
+              }}>
+                <span style={{ color: 'var(--purple-light)', fontSize: 14 }}>✦</span>
+              </div>
               <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--white-80)' }}>{item}</span>
             </div>
           ))}
