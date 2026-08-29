@@ -1,5 +1,5 @@
 // ══════════════════════════════════════════════════════
-//  WOMEN'S ONLY PROPHETIC GATHERING — Central Data Store
+//  WOMEN'S ONLY PROPHETIC GATHERING - Central Data Store
 // ══════════════════════════════════════════════════════
 
 export const EVENT_DATA = {
@@ -7,12 +7,12 @@ export const EVENT_DATA = {
   shortName: "Prophetic Gathering",
   tagline: "The Prophetic Wife",
   theme: "The Prophetic Wife",
-  subTheme: "A powerful one-day encounter for every woman — to receive, to be restored, and to walk in prophetic grace.",
+  subTheme: "A powerful one-day encounter for every woman. To receive, to be restored, and to walk in prophetic grace.",
   date: "26th September, 2026",
   time: "2:00 PM",
   venue: "Overcomers Nation Church, Tesano",
   dressCode: "Elegant / Modest",
-  entry: "Free — Women Only",
+  entry: "Free | Women Only",
   targetAudience: ["Women of All Ages", "Mothers", "Young Women & Girls", "Seekers of Prophetic Grace"],
   focusAreas: ["Prophetic Declaration", "Healing & Restoration", "Divine Empowerment", "Women in Ministry"],
   featuring: ["Word Ministration", "Prophetic Impartation", "Worship & Praise", "Prayer"],
@@ -25,7 +25,7 @@ export const EVENT_DATA = {
   },
 };
 
-// Social / Livestream Links — same channels as EOM
+// Social / Livestream Links - same channels as EOM
 export const SOCIAL_LINKS = [
   {
     id: 1,

@@ -137,7 +137,7 @@ export default function Admin() {
             {source === 'remote' ? '🟢 Live from Google Sheets' : '🟡 Local Cache'}
           </span>
           {!GOOGLE_SHEET_SCRIPT_URL && (
-            <span style={{ fontSize: 11, color: '#fbbf24', marginLeft: 12 }}>⚠ No Google Script URL configured — data is local only.</span>
+            <span style={{ fontSize: 11, color: '#fbbf24', marginLeft: 12 }}>No Google Script URL configured. Data is local only.</span>
           )}
         </div>
 
@@ -170,16 +170,16 @@ export default function Admin() {
                     <td style={{ color: 'var(--purple-light)', fontWeight: 700, fontSize: 10 }}>{r.id}</td>
                     <td style={{ fontWeight: 700, color: 'var(--white)' }}>{r.displayName || r.fullName}</td>
                     <td>{r.phone}</td>
-                    <td style={{ fontSize: 11 }}>{r.email || '—'}</td>
-                    <td>{r.location || '—'}</td>
-                    <td><span style={{ fontSize: 10, color: 'var(--white-60)' }}>{r.memberStatus || '—'}</span></td>
+                    <td style={{ fontSize: 11 }}>{r.email || '-'}</td>
+                    <td>{r.location || '-'}</td>
+                    <td><span style={{ fontSize: 10, color: 'var(--white-60)' }}>{r.memberStatus || '-'}</span></td>
                     <td>
                       <span className={`badge ${r.firstTimer === 'yes' ? 'badge-rose' : 'badge-gold'}`}>
                         {r.firstTimer === 'yes' ? '1st' : 'Returning'}
                       </span>
                     </td>
-                    <td style={{ fontSize: 11 }}>{r.attendanceMode || '—'}</td>
-                    <td style={{ fontSize: 10, color: 'var(--white-40)' }}>{r.registeredAt ? new Date(r.registeredAt).toLocaleDateString() : '—'}</td>
+                    <td style={{ fontSize: 11 }}>{r.attendanceMode || '-'}</td>
+                    <td style={{ fontSize: 10, color: 'var(--white-40)' }}>{r.registeredAt ? new Date(r.registeredAt).toLocaleDateString() : '-'}</td>
                     <td>
                       <button onClick={() => handleDelete(r.id)} style={{
                         background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.25)',

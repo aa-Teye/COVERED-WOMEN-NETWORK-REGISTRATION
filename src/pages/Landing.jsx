@@ -152,7 +152,7 @@ export default function Landing() {
       <section style={{ padding: '36px 20px 28px', background: 'var(--bg-mid)' }}>
         <p className="t-section-label" style={{ marginBottom: 20 }}>About the Gathering</p>
         <p style={{ fontSize: 14, color: 'var(--white-60)', lineHeight: 1.8, marginBottom: 24 }}>
-          A powerful, one-day gathering designed exclusively for women — to receive prophetic impartation, experience divine healing and restoration, and step into their God-given purpose. Hosted by{' '}
+          A powerful, one-day gathering designed exclusively for women. Receive prophetic impartation, experience divine healing and restoration, and step into your God-given purpose. Hosted by{' '}
           <span style={{ color: 'var(--purple-light)', fontWeight: 600 }}>Ebenezer Okronipa Ministries (EOM)</span>, in partnership with{' '}
           <span style={{ color: 'var(--white-60)', fontWeight: 600 }}>Overcomers Nation Church</span>.
         </p>
@@ -209,7 +209,7 @@ export default function Landing() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 2 }}>
                   <span className="badge badge-live">Live Stream</span>
                 </div>
-                <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--white-70)' }}>Watch on Facebook — {link.handle}</p>
+                <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--white-70)' }}>Watch on Facebook | {link.handle}</p>
               </div>
             </div>
             <ExternalLink size={16} style={{ color: 'rgba(255,255,255,0.3)', flexShrink: 0 }} />

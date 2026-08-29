@@ -104,7 +104,7 @@ export default function Register() {
         </button>
         <div>
           <p style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--purple-light)' }}>EOM</p>
-          <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--white)', lineHeight: 1.1 }}>Prophetic Gathering — Registration</p>
+          <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--white)', lineHeight: 1.1 }}>Prophetic Gathering Registration</p>
         </div>
       </div>
 
@@ -117,7 +117,7 @@ export default function Register() {
           </div>
           <div>
             <p style={{ fontWeight: 700, fontSize: 14, color: 'var(--white)', marginBottom: 4 }}>Join the Women's Prophetic Gathering</p>
-            <p style={{ fontSize: 12, color: 'var(--white-40)', lineHeight: 1.6 }}>Registration is completely free. Women of all ages are welcome — invite a friend!</p>
+            <p style={{ fontSize: 12, color: 'var(--white-40)', lineHeight: 1.6 }}>Registration is completely free. Women of all ages are welcome. Invite a friend!</p>
           </div>
         </div>
 
@@ -281,7 +281,7 @@ export default function Register() {
                 : <>Confirm My Place <ArrowRight size={15} /></>}
             </button>
             <p style={{ textAlign: 'center', fontSize: 10, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.2)', marginTop: 12 }}>
-              Free Registration — All Women Welcome
+              Free Registration | All Women Welcome
             </p>
             <p className="font-label" style={{ textAlign: 'center', fontSize: 14, color: 'var(--white)', fontWeight: 900, letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: 16 }}>
               She Shall Arise
@@ -436,7 +436,7 @@ function Success({ reg, nav, onReset }) {
         </div>
 
         <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginBottom: 24 }}>
-          Invite your sisters, mothers and daughters — all women are welcome.
+          Invite your sisters, mothers and daughters. All women are welcome.
         </p>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
