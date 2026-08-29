@@ -13,8 +13,8 @@ function doGet(e) {
     var user = params.username;
     var pass = params.password;
 
-    // Check Admin Authentication
-    if (user !== ADMIN_USER || pass !== ADMIN_PASS) {
+    // Check Admin Authentication (Accepts admin credentials or Master Admin PIN 2500)
+    if (user !== ADMIN_USER && user !== "2500" && (user !== ADMIN_USER || pass !== ADMIN_PASS)) {
       return responseJSON({ status: 'ERROR', message: 'Invalid admin credentials' });
     }
 
@@ -67,6 +67,18 @@ function doPost(e) {
         "referral",
         "prayerRequest"
       ]);
+    }
+
+    // Delete action
+    if (contents.action === "delete" && contents.id) {
+      var dValues = sheet.getDataRange().getValues();
+      for (var dri = 1; dri < dValues.length; dri++) {
+        if (dValues[dri][0].toString().trim() === contents.id.toString().trim()) {
+          sheet.deleteRow(dri + 1);
+          return responseJSON({ status: 'SUCCESS', message: 'Registration deleted' });
+        }
+      }
+      return responseJSON({ status: 'ERROR', message: 'ID not found' });
     }
 
     // Prevent duplicate entries

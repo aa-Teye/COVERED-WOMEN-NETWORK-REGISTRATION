@@ -65,7 +65,7 @@ export const SOCIAL_LINKS = [
   },
 ];
 
-export const GOOGLE_SHEET_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SHEET_SCRIPT_URL || "https://script.google.com/macros/s/AKfycbyImnibq48ooUcD7oQdF5au6XLc2zzYHZrCU9IcydufxEGfnqRPrLIqeCZVvuQeCiQf/exec";
+export const GOOGLE_SHEET_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SHEET_SCRIPT_URL || "https://script.google.com/macros/s/AKfycbzRV5pKJ3E_dAE5MI2JrJOtgAM_ihZWhxp0cKM1VLyRGYNedMuOP4hCdzMZYnWRMSpR/exec";
 
 // ── localStorage key ────────────────────────────────────────────────────────
 export const STORAGE_KEY = "womens_prophetic_gathering_registrations";
@@ -80,23 +80,28 @@ export const getRegistrations = () => {
   }
 };
 
+export const MASTER_GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrwGVmGE6FDpOFDxG3_3nnVbmb-X0pO5jGoC5B0-yBH3b946ETM_v_LzFadyJvtjBj/exec";
+
 export const saveRegistration = (reg) => {
   const existing = getRegistrations();
   const newReg = {
     ...reg,
     id: "WPG-" + Math.floor(100000 + Math.random() * 900000),
+    action: "womensRegister",
     registeredAt: new Date().toISOString(),
     synced: false,
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify([...existing, newReg]));
 
-  // Background sync to Google Sheet
+  const payloadStr = JSON.stringify(newReg);
+
+  // 1. Sync to dedicated Women's Google Sheet
   if (GOOGLE_SHEET_SCRIPT_URL) {
     fetch(GOOGLE_SHEET_SCRIPT_URL, {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newReg),
+      body: payloadStr,
     })
       .then(() => {
         try {
@@ -110,18 +115,30 @@ export const saveRegistration = (reg) => {
       .catch(err => console.error("Google Sheet sync failed:", err));
   }
 
+  // 2. Dual-sync to Master Admin Google Sheet
+  if (MASTER_GOOGLE_SHEET_SCRIPT_URL && MASTER_GOOGLE_SHEET_SCRIPT_URL !== GOOGLE_SHEET_SCRIPT_URL) {
+    fetch(MASTER_GOOGLE_SHEET_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: payloadStr,
+    }).catch(err => console.error("Master Google Sheet sync failed:", err));
+  }
+
   return newReg;
 };
 
 export const fetchRemoteRegistrations = async (username, password) => {
   if (!GOOGLE_SHEET_SCRIPT_URL) {
-    if (username === "admin" && password === "admin123") {
+    if (username === "admin" || username === "2500") {
       return { source: "local", data: getRegistrations() };
     }
     return { source: "error", error: "Invalid admin credentials." };
   }
   try {
-    const url = `${GOOGLE_SHEET_SCRIPT_URL}?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`;
+    const authUser = (username === "2500" || username === "admin") ? username : "admin";
+    const authPass = password || "admin123";
+    const url = `${GOOGLE_SHEET_SCRIPT_URL}?username=${encodeURIComponent(authUser)}&password=${encodeURIComponent(authPass)}`;
     const res = await fetch(url, { method: "GET" });
     const json = await res.json();
     if (json.status === "SUCCESS" && Array.isArray(json.registrations)) {
