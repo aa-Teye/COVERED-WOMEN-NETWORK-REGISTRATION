@@ -67,7 +67,7 @@ export const SOCIAL_LINKS = [
 
 // ── Google Sheets Apps Script Web App URL ──────────────────────────────────
 // Paste your NEW dedicated Apps Script Web App URL here after you deploy it.
-export const GOOGLE_SHEET_SCRIPT_URL = "";   // ← TODO: fill in after deploying Google Apps Script
+export const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJozX0fnqT1tQ-9Tj28PMK3dRqNWQFoBOSIIzpGlrA5ozncv_ofxBgFx9h86JFlVrc/exec";
 
 // ── localStorage key ────────────────────────────────────────────────────────
 export const STORAGE_KEY = "womens_prophetic_gathering_registrations";
