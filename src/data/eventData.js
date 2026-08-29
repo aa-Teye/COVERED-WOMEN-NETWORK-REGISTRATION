@@ -54,6 +54,15 @@ export const SOCIAL_LINKS = [
     isLivestream: false,
     description: "Follow for updates, photos and daily clips",
   },
+  {
+    id: 4,
+    platform: "TikTok",
+    handle: "@rev.dr.ebenezerokronipa",
+    url: "https://www.tiktok.com/@rev.dr.ebenezerokronipa?_r=1&_t=ZS-97utVLUStN2",
+    color: "#010101",
+    isLivestream: false,
+    description: "Follow us for clips and spiritual highlights",
+  },
 ];
 
 // ── Google Sheets Apps Script Web App URL ──────────────────────────────────
