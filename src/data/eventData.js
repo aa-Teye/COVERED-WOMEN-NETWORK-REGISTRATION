@@ -65,7 +65,7 @@ export const SOCIAL_LINKS = [
   },
 ];
 
-export const GOOGLE_SHEET_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SHEET_SCRIPT_URL || "https://script.google.com/macros/s/AKfycbzRV5pKJ3E_dAE5MI2JrJOtgAM_ihZWhxp0cKM1VLyRGYNedMuOP4hCdzMZYnWRMSpR/exec";
+export const GOOGLE_SHEET_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SHEET_SCRIPT_URL || "https://script.google.com/macros/s/AKfycbyImnibq48ooUcD7oQdF5au6XLc2zzYHZrCU9IcydufxEGfnqRPrLIqeCZVvuQeCiQf/exec";
 
 // ── localStorage key ────────────────────────────────────────────────────────
 export const STORAGE_KEY = "womens_prophetic_gathering_registrations";

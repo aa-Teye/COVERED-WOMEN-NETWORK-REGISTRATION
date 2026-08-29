@@ -2,29 +2,14 @@
  * ==============================================================================
  * GOOGLE APPS SCRIPT FOR WOMEN'S PROPHETIC GATHERING (THE PROPHETIC WIFE 2026)
  * ==============================================================================
- * 
- * INSTRUCTIONS TO DEPLOY:
- * 1. Open Google Sheets (create a new blank spreadsheet named "Women's Prophetic Gathering Registrations").
- * 2. Click Extensions > Apps Script.
- * 3. Delete any code in Code.gs and paste this entire file.
- * 4. Click Save (disk icon).
- * 5. Click Deploy > New deployment.
- * 6. Select type: "Web app".
- * 7. Set:
- *    - Description: "WPG Database API"
- *    - Execute as: "Me"
- *    - Who has access: "Anyone" (CRITICAL: Must be "Anyone" so the app can post registrations without login)
- * 8. Click Deploy, authorize access, and COPY the Web App URL.
- * 9. Paste the Web App URL into `src/data/eventData.js` for GOOGLE_SHEET_SCRIPT_URL.
  */
 
 var ADMIN_USER = "admin";
-var ADMIN_PASS = "admin123"; // You can change your admin password here
+var ADMIN_PASS = "admin123";
 
 function doGet(e) {
   try {
     var params = e.parameter || {};
-    var action = params.action;
     var user = params.username;
     var pass = params.password;
 
@@ -82,6 +67,17 @@ function doPost(e) {
         "referral",
         "prayerRequest"
       ]);
+    }
+
+    // Prevent duplicate entries
+    var regId = contents.id;
+    if (regId) {
+      var values = sheet.getDataRange().getValues();
+      for (var i = 1; i < values.length; i++) {
+        if (values[i][0].toString().trim() === regId.toString().trim()) {
+          return responseJSON({ status: 'SUCCESS', message: 'Already synced' });
+        }
+      }
     }
 
     // Append new registration
