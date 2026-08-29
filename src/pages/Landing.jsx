@@ -149,22 +149,13 @@ export default function Landing() {
       </section>
 
       {/* ── ABOUT SECTION ── */}
-      <section style={{ padding: '36px 20px 28px', background: 'var(--bg-mid)' }}>
-        <p className="t-section-label" style={{ marginBottom: 20 }}>About the Gathering</p>
-        <p style={{ fontSize: 14, color: 'var(--white-60)', lineHeight: 1.8, marginBottom: 24 }}>
-          A powerful, one-day gathering designed exclusively for women. Receive prophetic impartation, experience divine healing and restoration, and step into your God-given purpose. Hosted by{' '}
-          <span style={{ color: 'var(--purple-light)', fontWeight: 600 }}>Ebenezer Okronipa Ministries (EOM)</span>, in partnership with{' '}
-          <span style={{ color: 'var(--white-60)', fontWeight: 600 }}>Overcomers Nation Church</span>.
+      <section style={{ padding: '28px 20px', background: 'var(--bg-mid)' }}>
+        <p className="t-section-label" style={{ marginBottom: 12 }}>About the Gathering</p>
+        <p style={{ fontSize: 14, color: 'var(--white-60)', lineHeight: 1.7, marginBottom: 0 }}>
+          A one-day gathering for women, hosted by{' '}
+          <span style={{ color: 'var(--purple-light)', fontWeight: 600 }}>Ebenezer Okronipa Ministries</span>{' '}
+          at Overcomers Nation Church, Tesano. Come expecting prophetic impartation, healing and a fresh encounter with God.
         </p>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-          {EVENT_DATA.focusAreas.map(area => (
-            <div key={area} className="card" style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', gap: 10 }}>
-              <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--purple-light)', flexShrink: 0 }} />
-              <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--white-70)' }}>{area}</span>
-            </div>
-          ))}
-        </div>
       </section>
 
       {/* ── WHAT TO EXPECT ── */}
@@ -173,16 +164,11 @@ export default function Landing() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {EVENT_DATA.featuring.map((item, i) => (
             <div key={i} style={{
-              display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px',
+              display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px',
               background: 'rgba(147,51,234,0.05)', borderRadius: 10,
               border: '1px solid rgba(147,51,234,0.12)'
             }}>
-              <div style={{
-                width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                background: 'rgba(147,51,234,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center'
-              }}>
-                <span style={{ color: 'var(--purple-light)', fontSize: 14 }}>✦</span>
-              </div>
+              <span style={{ color: 'var(--gold-bright)', fontSize: 18, flexShrink: 0 }}>★</span>
               <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--white-80)' }}>{item}</span>
             </div>
           ))}
