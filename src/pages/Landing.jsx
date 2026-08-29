@@ -6,8 +6,8 @@ import { EVENT_DATA, SOCIAL_LINKS } from '../data/eventData';
 // ─── Countdown Timer ──────────────────────────────────────────────────────────
 // Update targetDate once the event date is confirmed
 function CountdownTimer() {
-  // Event date: 26th September 2026
-  const targetDate = useMemo(() => new Date('2026-09-26T09:00:00'), []);
+  // Event date: 26th September 2026, 2:00 PM
+  const targetDate = useMemo(() => new Date('2026-09-26T14:00:00'), []);
   const [timeLeft, setTimeLeft] = useState({ days: '00', hours: '00', minutes: '00', seconds: '00', live: false });
 
   useEffect(() => {

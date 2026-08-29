@@ -9,7 +9,7 @@ export const EVENT_DATA = {
   theme: "The Prophetic Wife",
   subTheme: "A powerful one-day encounter for every woman — to receive, to be restored, and to walk in prophetic grace.",
   date: "26th September, 2026",
-  time: "TBC",
+  time: "2:00 PM",
   venue: "Overcomers Nation Church, Tesano",
   dressCode: "Elegant / Modest",
   entry: "Free — Women Only",
