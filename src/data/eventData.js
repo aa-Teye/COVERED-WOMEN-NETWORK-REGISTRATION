@@ -18,10 +18,10 @@ export const EVENT_DATA = {
   featuring: ["Word Ministration", "Prophetic Impartation", "Worship & Praise", "Prayer"],
   enquiries: ["0546363971"],
   org: {
-    name: "Ebenezer Okronipa Ministries",
-    fullName: "Ebenezer Okronipa Ministries (EOM)",
+    name: "Covered Women Network",
+    fullName: "Covered Women Network (EOM)",
     tagline: "The Prophetic Wife",
-    partners: ["Overcomers Nation Church"],
+    partners: ["Ebenezer Okronipa Ministries", "Overcomers Nation Church"],
   },
 };
 

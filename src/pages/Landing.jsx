@@ -153,7 +153,8 @@ export default function Landing() {
         <p className="t-section-label" style={{ marginBottom: 12 }}>About the Gathering</p>
         <p style={{ fontSize: 14, color: 'var(--white-60)', lineHeight: 1.7, marginBottom: 0 }}>
           A one-day gathering for women, hosted by{' '}
-          <span style={{ color: 'var(--purple-light)', fontWeight: 600 }}>Ebenezer Okronipa Ministries</span>{' '}
+          <span style={{ color: 'var(--purple-light)', fontWeight: 600 }}>Covered Women Network</span>{' '}
+          under <span style={{ color: 'var(--purple-light)', fontWeight: 600 }}>Ebenezer Okronipa Ministries</span>{' '}
           at Overcomers Nation Church, Tesano. Come expecting prophetic impartation, healing and a fresh encounter with God.
         </p>
       </section>
