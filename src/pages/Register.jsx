@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, ChevronLeft, ArrowRight, Loader2, User, Phone, Mail, MapPin, Heart, HelpCircle, UserPlus, Star } from 'lucide-react';
+import { CheckCircle, ChevronLeft, ArrowRight, Loader2, User, Phone, Mail, MapPin, Heart, HelpCircle, UserPlus, Star, AlertCircle } from 'lucide-react';
 import { saveRegistration } from '../data/eventData';
 
 // ── Salutation options ─────────────────────────────────────────────────────────
@@ -37,11 +37,9 @@ const validate = (form) => {
   if (!form.phone.trim()) {
     e.phone = 'Phone number is required';
   } else if (!/^[0-9+\s()-]{7,}$/.test(form.phone)) {
-    e.phone = 'Enter a valid phone number';
+    e.phone = 'Please enter a valid phone number (e.g. 0244 123 456)';
   }
-  if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-    e.email = 'Enter a valid email address';
-  }
+  // Email is optional and non-compulsory
   if (!form.memberStatus) e.memberStatus = 'Please select your membership status';
   if (!form.firstTimer) e.firstTimer = 'Please let us know if this is your first time';
   if (!form.attendanceMode) e.attendanceMode = 'Please select your attendance mode';
@@ -54,6 +52,7 @@ export default function Register() {
   const nav = useNavigate();
   const [form, setForm] = useState(INIT);
   const [errors, setErrors] = useState({});
+  const [toastError, setToastError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [saved, setSaved] = useState(null);
@@ -62,21 +61,40 @@ export default function Register() {
     const { name, value } = e.target;
     setForm(f => ({ ...f, [name]: value }));
     if (errors[name]) setErrors(er => ({ ...er, [name]: '' }));
+    if (toastError) setToastError('');
   };
 
   const onSubmit = async e => {
     e.preventDefault();
     const errs = validate(form);
-    if (Object.keys(errs).length) { setErrors(errs); return; }
+    if (Object.keys(errs).length) {
+      setErrors(errs);
+      const firstErrKey = Object.keys(errs)[0];
+      const errorMsg = errs[firstErrKey];
+      setToastError(errorMsg);
+      setTimeout(() => setToastError(''), 4500);
+
+      // Auto-scroll to the exact field that failed validation
+      setTimeout(() => {
+        const el = document.getElementById(`reg-${firstErrKey}`) || document.querySelector(`[name="${firstErrKey}"]`);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (el.focus) el.focus({ preventScroll: true });
+        }
+      }, 50);
+      return;
+    }
     setSubmitting(true);
+    setToastError('');
 
     const payload = {
       ...form,
       displayName: form.title ? `${form.title}. ${form.fullName.trim()}` : form.fullName.trim(),
     };
 
-    await new Promise(r => setTimeout(r, 800));
-    setSaved(saveRegistration(payload));
+    await new Promise(r => setTimeout(r, 600));
+    const regResult = saveRegistration(payload);
+    setSaved(regResult);
     setDone(true);
     setSubmitting(false);
   };
@@ -186,7 +204,7 @@ export default function Register() {
           />
 
           {/* First Timer */}
-          <div>
+          <div id="reg-firstTimer">
             <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <UserPlus size={13} style={{ color: 'var(--purple-light)' }} />
               Is this your first time at the Women's Prophetic Gathering?
@@ -206,7 +224,7 @@ export default function Register() {
                   transition: 'all 0.2s'
                 }}>
                   <input type="radio" name="firstTimer" value={opt.val} checked={form.firstTimer === opt.val}
-                    onChange={onChange} style={{ display: 'none' }} />
+                    onChange={e => { onChange(e); if (errors.firstTimer) setErrors(er => ({ ...er, firstTimer: '' })); }} style={{ display: 'none' }} />
                   {opt.label}
                 </label>
               ))}
@@ -227,7 +245,7 @@ export default function Register() {
           </FormField>
 
           {/* Attendance Mode */}
-          <div>
+          <div id="reg-attendanceMode">
             <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <Star size={13} style={{ color: 'var(--purple-light)' }} />
               Will you be attending in person?
@@ -247,7 +265,7 @@ export default function Register() {
                   transition: 'all 0.2s'
                 }}>
                   <input type="radio" name="attendanceMode" value={opt.val} checked={form.attendanceMode === opt.val}
-                    onChange={onChange} style={{ display: 'none' }} />
+                    onChange={e => { onChange(e); if (errors.attendanceMode) setErrors(er => ({ ...er, attendanceMode: '' })); }} style={{ display: 'none' }} />
                   {opt.label}
                 </label>
               ))}
@@ -289,6 +307,21 @@ export default function Register() {
           </div>
         </form>
       </div>
+
+      {toastError && (
+        <div style={{
+          position: 'fixed', bottom: 24, left: '50%', transform: 'translateX(-50%)',
+          zIndex: 9999, background: 'rgba(239,68,68,0.95)', backdropFilter: 'blur(12px)',
+          border: '1px solid rgba(255,255,255,0.2)', borderRadius: 12,
+          padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 10,
+          color: '#fff', fontSize: 13, fontWeight: 700, boxShadow: '0 12px 40px rgba(0,0,0,0.5)',
+          maxWidth: '90vw', textAlign: 'center'
+        }}>
+          <AlertCircle size={18} style={{ flexShrink: 0 }} />
+          <span>{toastError}</span>
+        </div>
+      )}
+
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
@@ -313,7 +346,7 @@ function FormField({ icon, label, hint, required, error, children }) {
 // ── Radio group (vertical list style) ────────────────────────────────────────
 function RadioGroup({ label, icon, required, error, options, value, onChange }) {
   return (
-    <div>
+    <div id="reg-memberStatus">
       <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
         {icon} {label} {required && <span style={{ color: '#ef4444' }}>*</span>}
       </label>
