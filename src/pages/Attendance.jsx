@@ -360,6 +360,17 @@ export default function Attendance() {
     }
   }, [authed]);
 
+  // Periodic background polling every 45 seconds to keep all ushers in sync
+  useEffect(() => {
+    if (!authed) return;
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        syncData(true);
+      }
+    }, 45000);
+    return () => clearInterval(interval);
+  }, [authed]);
+
   const showToast = (msg, type = 'success') => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3000);
@@ -383,8 +394,8 @@ export default function Attendance() {
   };
 
   // Sync registrations and attendance from Google Sheet
-  const syncData = async () => {
-    setLoading(true);
+  const syncData = async (silent = false) => {
+    if (!silent) setLoading(true);
     try {
       const [remoteRegs, remoteAtt] = await Promise.all([
         fetchRemoteRegistrations(ATTENDANCE_PIN, ''),
@@ -401,11 +412,11 @@ export default function Attendance() {
         setAttendance(remoteAtt.data);
         overwriteAttendanceFromRemote(remoteAtt.data);
       }
-      showToast('Live database sync complete!', 'info');
+      if (!silent) showToast('Live database sync complete!', 'info');
     } catch {
-      showToast('Offline mode — using local records.', 'warn');
+      if (!silent) showToast('Offline mode — using local records.', 'warn');
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -441,7 +452,13 @@ export default function Attendance() {
   };
 
   const handleWalkinSave = (data) => {
-    const result = saveWalkinRegistration(data);
+    let cleanPhone = (data.phone || '').trim();
+    if (cleanPhone.startsWith('+233')) {
+      cleanPhone = '0' + cleanPhone.slice(4).trim();
+    } else if (cleanPhone.startsWith('+')) {
+      cleanPhone = cleanPhone.slice(1).trim();
+    }
+    const result = saveWalkinRegistration({ ...data, phone: cleanPhone });
     setRegistrations(getRegistrations());
     setAttendance(getAttendance());
     showToast(`✓ Walk-in: ${data.fullName} registered & checked in!`, 'success');

@@ -153,11 +153,16 @@ function doPost(e) {
         }
       }
 
+      var safePhone = (contents.phone || "").toString().trim();
+      if (safePhone.charAt(0) === "+" || safePhone.charAt(0) === "=") {
+        safePhone = "'" + safePhone;
+      }
+
       attSheet.appendRow([
         contents.id || ("WATT-" + Math.floor(100000 + Math.random() * 900000)),
         contents.registrationId || "",
         contents.name || "",
-        contents.phone || "",
+        safePhone,
         targetDate,
         contents.isWalkin ? "Yes" : "No",
         contents.checkedInAt || new Date().toISOString()
@@ -252,6 +257,11 @@ function doPost(e) {
       }
     }
 
+    var safeRegPhone = (contents.phone || "").toString().trim();
+    if (safeRegPhone.charAt(0) === "+" || safeRegPhone.charAt(0) === "=") {
+      safeRegPhone = "'" + safeRegPhone;
+    }
+
     // Append new registration
     sheet.appendRow([
       contents.id || "",
@@ -259,7 +269,7 @@ function doPost(e) {
       contents.title || "",
       contents.fullName || "",
       contents.displayName || "",
-      contents.phone || "",
+      safeRegPhone,
       contents.email || "",
       contents.age || "",
       contents.memberStatus || "",

@@ -87,8 +87,17 @@ export default function Register() {
     setSubmitting(true);
     setToastError('');
 
+    // Clean phone: convert +233 to standard 0 format or remove leading + to avoid spreadsheet #ERROR! formula evaluation
+    let cleanPhone = form.phone.trim();
+    if (cleanPhone.startsWith('+233')) {
+      cleanPhone = '0' + cleanPhone.slice(4).trim();
+    } else if (cleanPhone.startsWith('+')) {
+      cleanPhone = cleanPhone.slice(1).trim();
+    }
+
     const payload = {
       ...form,
+      phone: cleanPhone,
       displayName: form.title ? `${form.title}. ${form.fullName.trim()}` : form.fullName.trim(),
     };
 
