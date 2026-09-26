@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Search, X, CheckCircle2, UserPlus, RefreshCw,
-  UserCheck, LogOut, Download, Wifi, WifiOff, Plus, ChevronLeft, ShieldCheck
+  UserCheck, LogOut, Download, Wifi, WifiOff, Plus, ChevronLeft, ShieldCheck, RotateCcw
 } from 'lucide-react';
 import {
   getRegistrations,
@@ -55,7 +55,7 @@ function Toast({ toast }) {
 }
 
 /* ─── Attendee Card ──────────────────────────────────────────────────────── */
-function PersonCard({ reg, checkedIn, onMark }) {
+function PersonCard({ reg, checkedIn, onMark, onUnmark }) {
   const title    = pick(reg, 'title', 'Title');
   const rawName  = pick(reg, 'fullName', 'fullname', 'Full Name') || 'Unknown';
   const name     = title ? `${title}. ${rawName}` : rawName;
@@ -113,13 +113,45 @@ function PersonCard({ reg, checkedIn, onMark }) {
       </div>
 
       {checkedIn ? (
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, flexShrink: 0 }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 5,
-            background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.35)',
-            borderRadius: 20, padding: '6px 12px', color: '#4ade80', fontSize: 12, fontWeight: 700,
-          }}>
-            <CheckCircle2 size={14} /> Present
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 5,
+              background: 'rgba(74,222,128,0.15)', border: '1px solid rgba(74,222,128,0.35)',
+              borderRadius: 20, padding: '5px 11px', color: '#4ade80', fontSize: 12, fontWeight: 700,
+            }}>
+              <CheckCircle2 size={13} /> Present
+            </div>
+            {onUnmark && (
+              <button
+                onClick={() => onUnmark(checkedIn, name)}
+                title="Undo check-in (revert to pending/absent)"
+                style={{
+                  background: 'rgba(244,63,94,0.12)',
+                  border: '1px solid rgba(244,63,94,0.35)',
+                  borderRadius: 10,
+                  padding: '5px 9px',
+                  color: '#fb7185',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 4,
+                  transition: 'all 0.15s ease',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = 'rgba(244,63,94,0.22)';
+                  e.currentTarget.style.borderColor = 'rgba(244,63,94,0.55)';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = 'rgba(244,63,94,0.12)';
+                  e.currentTarget.style.borderColor = 'rgba(244,63,94,0.35)';
+                }}
+              >
+                <RotateCcw size={11} /> Unmark
+              </button>
+            )}
           </div>
           {checkedIn.checkedInAt && (
             <span style={{ fontSize: 10, color: 'rgba(74,222,128,0.7)', fontWeight: 600 }}>
@@ -385,6 +417,16 @@ export default function Attendance() {
       setAttendance(getAttendance());
       showToast(`✓ ${rawName} checked in successfully!`, 'success');
     }
+  };
+
+  const handleUnmark = (attRecord, name) => {
+    if (!attRecord || !attRecord.id) return;
+    const ok = window.confirm(`Revert check-in for "${name}"?\n\nThis will mark this attendee back as Pending / Absent.`);
+    if (!ok) return;
+
+    deleteAttendanceRecord(attRecord.id);
+    setAttendance(getAttendance());
+    showToast(`↩ Check-in reverted for ${name}`, 'warn');
   };
 
   const handleWalkinSave = (data) => {
@@ -780,6 +822,7 @@ export default function Attendance() {
                 reg={item.reg}
                 checkedIn={item.checkedIn}
                 onMark={handleMark}
+                onUnmark={handleUnmark}
               />
             ))
           )}

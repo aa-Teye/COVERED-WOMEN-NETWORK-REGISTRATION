@@ -153,8 +153,33 @@ export const fetchRemoteRegistrations = async (username, password) => {
 
 export const deleteLocalRegistration = (id) => {
   const existing = getRegistrations();
+  const toDelete = existing.find(r => r.id === id);
   const updated = existing.filter(r => r.id !== id);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+
+  // Also cascade delete from attendance storage so deleted registrants do not linger in attendance
+  try {
+    const existingAtt = getAttendance();
+    const regName = toDelete ? (toDelete.fullName || toDelete.name || '').trim().toLowerCase() : '';
+    const updatedAtt = existingAtt.filter(a => {
+      if (a.registrationId && a.registrationId === id) return false;
+      if (regName && (a.name || '').trim().toLowerCase() === regName) return false;
+      return true;
+    });
+    localStorage.setItem(ATTENDANCE_STORAGE_KEY, JSON.stringify(updatedAtt));
+  } catch (_) {}
+
+  // Remote delete from Google Sheet if configured
+  if (GOOGLE_SHEET_SCRIPT_URL) {
+    const regName = toDelete ? (toDelete.fullName || toDelete.name || '') : '';
+    fetch(GOOGLE_SHEET_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "deleteRegistration", id, name: regName }),
+    }).catch(() => {});
+  }
+
   return updated;
 };
 
@@ -305,6 +330,14 @@ export const deleteAttendanceRecord = (id) => {
       mode: "no-cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "deleteAttendance", id }),
+    }).catch(() => {});
+  }
+  if (MASTER_GOOGLE_SHEET_SCRIPT_URL && MASTER_GOOGLE_SHEET_SCRIPT_URL !== GOOGLE_SHEET_SCRIPT_URL) {
+    fetch(MASTER_GOOGLE_SHEET_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "deleteAttendance", id, username: "2500" }),
     }).catch(() => {});
   }
   return updated;

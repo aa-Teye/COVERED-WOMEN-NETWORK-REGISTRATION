@@ -135,6 +135,31 @@ function doPost(e) {
       return responseJSON({ status: 'ERROR', message: 'Attendance ID not found' });
     }
 
+    // ── Handle Delete Registration (Cascades to Attendance) ──
+    if (contents.action === "deleteRegistration" && contents.id) {
+      var regSheet = getOrCreateSheet("Registrations");
+      var dRegValues = regSheet.getDataRange().getValues();
+      for (var dri = 1; dri < dRegValues.length; dri++) {
+        if (dRegValues[dri][0].toString().trim() === contents.id.toString().trim()) {
+          regSheet.deleteRow(dri + 1);
+          break;
+        }
+      }
+      // Also remove any attendance rows associated with this registrant
+      var attSheet = getOrCreateSheet("Attendance");
+      var dAttValues = attSheet.getDataRange().getValues();
+      var targetId = contents.id.toString().trim();
+      var targetName = contents.name ? contents.name.toString().trim().toLowerCase() : "";
+      for (var dai = dAttValues.length - 1; dai >= 1; dai--) {
+        var rowRegId = dAttValues[dai][1] ? dAttValues[dai][1].toString().trim() : "";
+        var rowName = dAttValues[dai][2] ? dAttValues[dai][2].toString().trim().toLowerCase() : "";
+        if ((rowRegId && rowRegId === targetId) || (targetName && rowName === targetName)) {
+          attSheet.deleteRow(dai + 1);
+        }
+      }
+      return responseJSON({ status: 'SUCCESS', message: 'Registration and linked attendance deleted' });
+    }
+
     // ── Pre-Registrations Sheet ──
     var sheet = getOrCreateSheet("Registrations");
 
