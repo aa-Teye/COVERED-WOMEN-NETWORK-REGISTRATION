@@ -23,6 +23,7 @@ const ATTENDANCE_PIN = '2500';
 const SESSION_DATE = EVENT_DATA.date || '26th September, 2026';
 
 function pick(r, ...keys) {
+  if (!r || typeof r !== 'object') return '';
   for (const k of keys) {
     const exact = Object.keys(r).find(rk => rk.toLowerCase() === k.toLowerCase());
     if (exact && r[exact] !== undefined && r[exact] !== '') return String(r[exact]);
@@ -497,11 +498,40 @@ export default function Attendance() {
 
   // Filter & Search
   const filteredList = useMemo(() => {
-    const q = search.trim().toLowerCase();
+    const rawQ = search.trim().toLowerCase();
+    const cleanQ = rawQ.replace(/[^0-9]/g, ''); // digits only for phone matching
+    const qTokens = rawQ.split(/\s+/).filter(Boolean);
+
     return mergedList.filter(item => {
-      const name = (pick(item.reg, 'fullName', 'fullname', 'Full Name') || '').toLowerCase();
-      const phone = (pick(item.reg, 'phone', 'Phone') || '').toLowerCase();
-      const matchesSearch = !q || name.includes(q) || phone.includes(q);
+      const reg = item.reg || {};
+      const name = (pick(reg, 'fullName', 'fullname', 'Full Name', 'displayName', 'name', 'Name') || '').toLowerCase();
+      const rawPhone = (pick(reg, 'phone', 'Phone', 'telephone', 'mobile') || '').toLowerCase();
+      const cleanPhone = rawPhone.replace(/[^0-9]/g, '');
+      const id = (pick(reg, 'id', 'ID', 'registrationId') || '').toLowerCase();
+      const email = (pick(reg, 'email', 'Email') || '').toLowerCase();
+      const location = (pick(reg, 'location', 'Location') || '').toLowerCase();
+
+      // Combined searchable text
+      const fullSearchCorpus = `${name} ${id} ${email} ${location} ${rawPhone}`;
+
+      let matchesSearch = true;
+      if (qTokens.length > 0) {
+        // 1. Text token match (every word must appear in corpus)
+        const textMatches = qTokens.every(token => fullSearchCorpus.includes(token));
+
+        // 2. Smart Phone match (handles 024... vs 24... vs +233...)
+        let phoneMatches = false;
+        if (cleanQ.length >= 3) {
+          phoneMatches = cleanPhone.includes(cleanQ) ||
+                         (cleanQ.startsWith('0') && cleanPhone.includes(cleanQ.slice(1))) ||
+                         (!cleanQ.startsWith('0') && ('0' + cleanPhone).includes(cleanQ)) ||
+                         (cleanPhone.length >= 3 && cleanPhone.endsWith(cleanQ)) ||
+                         (cleanPhone.length >= 3 && cleanQ.endsWith(cleanPhone));
+        }
+
+        matchesSearch = textMatches || phoneMatches;
+      }
+
       if (!matchesSearch) return false;
 
       if (filterMode === 'present') return Boolean(item.checkedIn);
