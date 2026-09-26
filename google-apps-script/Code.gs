@@ -43,6 +43,50 @@ function doGet(e) {
       return responseJSON({ status: 'SUCCESS', attendance: attRows.reverse() });
     }
 
+    // ── Handle Delete Registration via GET (Cascades to Attendance) ──
+    if (e.parameter.action === "deleteRegistration" && e.parameter.id) {
+      var targetId = e.parameter.id.toString().trim();
+      var targetName = e.parameter.name ? e.parameter.name.toString().trim().toLowerCase() : "";
+
+      var regSheet = getOrCreateSheet("Registrations");
+      var dRegValues = regSheet.getDataRange().getValues();
+      var regDeleted = false;
+      for (var dri = dRegValues.length - 1; dri >= 1; dri--) {
+        if (dRegValues[dri][0].toString().trim() === targetId) {
+          regSheet.deleteRow(dri + 1);
+          regDeleted = true;
+          break;
+        }
+      }
+
+      // Also cascade delete from Attendance sheet
+      var attSheet = getOrCreateSheet("Attendance");
+      var dAttValues = attSheet.getDataRange().getValues();
+      for (var dai = dAttValues.length - 1; dai >= 1; dai--) {
+        var rowRegId = dAttValues[dai][1] ? dAttValues[dai][1].toString().trim() : "";
+        var rowName = dAttValues[dai][2] ? dAttValues[dai][2].toString().trim().toLowerCase() : "";
+        if ((rowRegId && rowRegId === targetId) || (targetName && rowName === targetName)) {
+          attSheet.deleteRow(dai + 1);
+        }
+      }
+
+      return responseJSON({ status: 'SUCCESS', message: 'Registration and linked attendance permanently deleted', deleted: regDeleted });
+    }
+
+    // ── Handle Delete Attendance via GET ──
+    if (e.parameter.action === "deleteAttendance" && e.parameter.id) {
+      var dAttId = e.parameter.id.toString().trim();
+      var attSheet = getOrCreateSheet("Attendance");
+      var dAttValues = attSheet.getDataRange().getValues();
+      for (var dai = dAttValues.length - 1; dai >= 1; dai--) {
+        if (dAttValues[dai][0].toString().trim() === dAttId) {
+          attSheet.deleteRow(dai + 1);
+          return responseJSON({ status: 'SUCCESS', message: 'Attendance permanently deleted' });
+        }
+      }
+      return responseJSON({ status: 'ERROR', message: 'Attendance ID not found' });
+    }
+
     // 2. Pre-Registrations Fetch (Default)
     var sheet = getOrCreateSheet("Registrations");
     var data = sheet.getDataRange().getValues();
