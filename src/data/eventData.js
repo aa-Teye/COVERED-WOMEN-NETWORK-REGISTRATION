@@ -80,7 +80,8 @@ export const getRegistrations = () => {
   }
 };
 
-export const MASTER_GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrwGVmGE6FDpOFDxG3_3nnVbmb-X0pO5jGoC5B0-yBH3b946ETM_v_LzFadyJvtjBj/exec";
+// Master Google Sheet URL disabled during standalone event mode to prevent cross-contamination
+export const MASTER_GOOGLE_SHEET_SCRIPT_URL = null;
 
 export const saveRegistration = (reg) => {
   const existing = getRegistrations();
