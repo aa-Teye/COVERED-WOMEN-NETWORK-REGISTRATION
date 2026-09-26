@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle, ChevronLeft, ArrowRight, Loader2, User, Phone, Mail, MapPin, Heart, HelpCircle, UserPlus, Star, AlertCircle } from 'lucide-react';
+import { CheckCircle, ChevronLeft, ArrowRight, Loader2, User, Phone, Mail, MapPin, Heart, HelpCircle, UserPlus, Star, AlertCircle, UserCheck } from 'lucide-react';
 import { saveRegistration } from '../data/eventData';
 
 // ── Salutation options ─────────────────────────────────────────────────────────
@@ -111,25 +111,42 @@ export default function Register() {
         position: 'sticky', top: 0, zIndex: 50,
         background: 'rgba(8,0,15,0.92)', backdropFilter: 'blur(16px)',
         borderBottom: '1px solid rgba(147,51,234,0.12)',
-        padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 14
+        padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 14
       }}>
-        <button onClick={() => nav('/')} style={{
-          background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)',
-          borderRadius: 8, padding: '6px 10px', color: 'var(--white-70)', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600
-        }}>
-          <ChevronLeft size={14} /> Back
-        </button>
-        <div>
-          <p style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--purple-light)' }}>EOM</p>
-          <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--white)', lineHeight: 1.1 }}>Prophetic Gathering Registration</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <button onClick={() => nav('/')} style={{
+            background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)',
+            borderRadius: 8, padding: '6px 10px', color: 'var(--white-70)', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 4, fontSize: 12, fontWeight: 600
+          }}>
+            <ChevronLeft size={14} /> Back
+          </button>
+          <div>
+            <p style={{ fontSize: 10, fontWeight: 800, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--purple-light)' }}>EOM</p>
+            <p style={{ fontSize: 13, fontWeight: 700, color: 'var(--white)', lineHeight: 1.1 }}>Prophetic Gathering</p>
+          </div>
         </div>
+
+        <button
+          type="button"
+          onClick={() => nav('/attendance')}
+          style={{
+            background: 'linear-gradient(135deg, rgba(147,51,234,0.25), rgba(192,132,252,0.15))',
+            border: '1px solid rgba(192,132,252,0.4)',
+            borderRadius: 10, padding: '7px 12px', color: '#c084fc',
+            fontSize: 12, fontWeight: 700, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: 6,
+            boxShadow: '0 2px 10px rgba(147,51,234,0.2)',
+          }}
+        >
+          <UserCheck size={14} /> Check-In
+        </button>
       </div>
 
       <div style={{ maxWidth: 480, margin: '0 auto', padding: '24px 20px 120px' }}>
 
         {/* Intro card */}
-        <div className="card card-purple" style={{ padding: '18px 20px', marginBottom: 28, display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+        <div className="card card-purple" style={{ padding: '18px 20px', marginBottom: 18, display: 'flex', gap: 14, alignItems: 'flex-start' }}>
           <div style={{ width: 40, height: 40, borderRadius: 10, background: 'rgba(147,51,234,0.15)', border: '1px solid rgba(147,51,234,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <Star size={18} style={{ color: 'var(--purple-light)' }} />
           </div>
@@ -137,6 +154,29 @@ export default function Register() {
             <p style={{ fontWeight: 700, fontSize: 14, color: 'var(--white)', marginBottom: 4 }}>Join the Women's Prophetic Gathering</p>
             <p style={{ fontSize: 12, color: 'var(--white-40)', lineHeight: 1.6 }}>Registration is completely free. Women of all ages are welcome. Invite a friend!</p>
           </div>
+        </div>
+
+        {/* Quick check-in banner */}
+        <div style={{
+          background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(192,132,252,0.2)',
+          borderRadius: 14, padding: '12px 16px', marginBottom: 26,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12
+        }}>
+          <div>
+            <p style={{ fontSize: 12, fontWeight: 700, color: '#fff', margin: 0 }}>Already Registered?</p>
+            <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', margin: '2px 0 0' }}>Open Attendance Check-In Portal</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => nav('/attendance')}
+            style={{
+              background: 'linear-gradient(135deg, #9333ea, #c084fc)', border: 'none',
+              borderRadius: 10, padding: '8px 14px', color: '#fff', fontSize: 12, fontWeight: 700,
+              cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap'
+            }}
+          >
+            <UserCheck size={13} /> Check In
+          </button>
         </div>
 
         <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 22 }} noValidate>

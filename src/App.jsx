@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation, Link } from 'react-router-dom';
-import { Home, UserPlus, Share2, Key } from 'lucide-react';
+import { Home, UserPlus, Share2, Key, UserCheck } from 'lucide-react';
 import { useEffect } from 'react';
 import Landing from './pages/Landing';
 import Register from './pages/Register';
@@ -9,9 +9,10 @@ import Attendance from './pages/Attendance';
 import { GOOGLE_SHEET_SCRIPT_URL, STORAGE_KEY, getRegistrations } from './data/eventData';
 
 const NAV = [
-  { to: '/',         label: 'Home',     icon: Home },
-  { to: '/register', label: 'Register', icon: UserPlus },
-  { to: '/connect',  label: 'Connect',  icon: Share2 },
+  { to: '/',           label: 'Home',     icon: Home },
+  { to: '/register',   label: 'Register', icon: UserPlus },
+  { to: '/attendance', label: 'Check-In', icon: UserCheck },
+  { to: '/connect',    label: 'Connect',  icon: Share2 },
 ];
 
 function BottomNav() {
