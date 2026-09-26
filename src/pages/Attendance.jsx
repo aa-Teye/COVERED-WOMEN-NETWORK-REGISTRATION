@@ -14,6 +14,7 @@ import {
   exportAttendanceToCSV,
   deleteAttendanceRecord,
   saveWalkinRegistration,
+  STORAGE_KEY,
   GOOGLE_SHEET_SCRIPT_URL,
   EVENT_DATA,
 } from '../data/eventData';
@@ -351,6 +352,13 @@ export default function Attendance() {
     };
   }, []);
 
+  // Auto-sync whenever user enters/loads authenticated attendance view
+  useEffect(() => {
+    if (authed) {
+      syncData();
+    }
+  }, [authed]);
+
   const showToast = (msg, type = 'success') => {
     setToast({ msg, type });
     setTimeout(() => setToast(null), 3000);
@@ -362,7 +370,6 @@ export default function Attendance() {
       sessionStorage.setItem('cwn_attendance_auth', 'true');
       setAuthed(true);
       setPinError('');
-      syncData();
     } else {
       setPinError('Incorrect Usher PIN. Enter 2500');
     }
@@ -385,6 +392,9 @@ export default function Attendance() {
 
       if (remoteRegs && remoteRegs.data && Array.isArray(remoteRegs.data)) {
         setRegistrations(remoteRegs.data);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(remoteRegs.data));
+        } catch (_) {}
       }
       if (remoteAtt && remoteAtt.data && Array.isArray(remoteAtt.data)) {
         setAttendance(remoteAtt.data);
