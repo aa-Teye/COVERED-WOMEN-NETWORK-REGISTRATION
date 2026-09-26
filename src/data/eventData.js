@@ -80,8 +80,7 @@ export const getRegistrations = () => {
   }
 };
 
-// Master Google Sheet URL disabled during standalone event mode to prevent cross-contamination
-export const MASTER_GOOGLE_SHEET_SCRIPT_URL = null;
+export const MASTER_GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrwGVmGE6FDpOFDxG3_3nnVbmb-X0pO5jGoC5B0-yBH3b946ETM_v_LzFadyJvtjBj/exec";
 
 export const saveRegistration = (reg) => {
   const existing = getRegistrations();
@@ -111,7 +110,7 @@ export const saveRegistration = (reg) => {
             r.id === newReg.id ? { ...r, synced: true } : r
           );
           localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-        } catch (_) {}
+        } catch (_) { }
       })
       .catch(err => console.error("Google Sheet sync failed:", err));
   }
@@ -168,7 +167,7 @@ export const deleteLocalRegistration = (id) => {
       return true;
     });
     localStorage.setItem(ATTENDANCE_STORAGE_KEY, JSON.stringify(updatedAtt));
-  } catch (_) {}
+  } catch (_) { }
 
   // Remote delete from Google Sheet if configured
   if (GOOGLE_SHEET_SCRIPT_URL) {
@@ -178,7 +177,7 @@ export const deleteLocalRegistration = (id) => {
       mode: "no-cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "deleteRegistration", id, name: regName }),
-    }).catch(() => {});
+    }).catch(() => { });
   }
 
   return updated;
@@ -211,7 +210,7 @@ export const getAttendance = () => {
 export const overwriteAttendanceFromRemote = (records) => {
   try {
     localStorage.setItem(ATTENDANCE_STORAGE_KEY, JSON.stringify(records));
-  } catch (_) {}
+  } catch (_) { }
 };
 
 /**
@@ -264,7 +263,7 @@ export const markAttendance = ({ registrationId, name, phone, sessionDate = "26t
           const current = getAttendance();
           const synced = current.map(a => a.id === record.id ? { ...a, synced: true } : a);
           localStorage.setItem(ATTENDANCE_STORAGE_KEY, JSON.stringify(synced));
-        } catch (_) {}
+        } catch (_) { }
       })
       .catch(err => console.error("Women's Attendance sync failed:", err));
   }
@@ -331,7 +330,7 @@ export const deleteAttendanceRecord = (id) => {
       mode: "no-cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "deleteAttendance", id }),
-    }).catch(() => {});
+    }).catch(() => { });
   }
   if (MASTER_GOOGLE_SHEET_SCRIPT_URL && MASTER_GOOGLE_SHEET_SCRIPT_URL !== GOOGLE_SHEET_SCRIPT_URL) {
     fetch(MASTER_GOOGLE_SHEET_SCRIPT_URL, {
@@ -339,7 +338,7 @@ export const deleteAttendanceRecord = (id) => {
       mode: "no-cors",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "deleteAttendance", id, username: "2500" }),
-    }).catch(() => {});
+    }).catch(() => { });
   }
   return updated;
 };
