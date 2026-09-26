@@ -12,12 +12,38 @@ function doGet(e) {
     var params = e.parameter || {};
     var user = params.username;
     var pass = params.password;
+    var action = params.action;
 
     // Check Admin Authentication (Accepts admin credentials or Master Admin PIN 2500)
     if (user !== ADMIN_USER && user !== "2500" && (user !== ADMIN_USER || pass !== ADMIN_PASS)) {
       return responseJSON({ status: 'ERROR', message: 'Invalid admin credentials' });
     }
 
+    // 1. Attendance Records Fetch
+    if (action === "getAttendance" || action === "getWomensAttendance") {
+      var attSheet = getOrCreateSheet("Attendance");
+      var attData = attSheet.getDataRange().getValues();
+      if (attData.length <= 1) {
+        return responseJSON({ status: 'SUCCESS', attendance: [] });
+      }
+
+      var attRows = [];
+      for (var a = 1; a < attData.length; a++) {
+        var aRow = attData[a];
+        attRows.push({
+          id:             aRow[0] ? aRow[0].toString() : "",
+          registrationId: aRow[1] ? aRow[1].toString() : "",
+          name:           aRow[2] ? aRow[2].toString() : "",
+          phone:          aRow[3] ? aRow[3].toString() : "",
+          sessionDate:    aRow[4] ? aRow[4].toString() : "",
+          isWalkin:       aRow[5] ? aRow[5].toString().toLowerCase() === "yes" : false,
+          checkedInAt:    aRow[6] ? aRow[6].toString() : ""
+        });
+      }
+      return responseJSON({ status: 'SUCCESS', attendance: attRows.reverse() });
+    }
+
+    // 2. Pre-Registrations Fetch (Default)
     var sheet = getOrCreateSheet("Registrations");
     var data = sheet.getDataRange().getValues();
     if (data.length <= 1) {
@@ -46,6 +72,70 @@ function doGet(e) {
 function doPost(e) {
   try {
     var contents = JSON.parse(e.postData.contents);
+
+    // ── Handle Attendance Marking ──
+    if (contents.action === "attendance" || contents.action === "womensAttendance") {
+      var attSheet = getOrCreateSheet("Attendance");
+
+      if (attSheet.getLastRow() === 0) {
+        attSheet.appendRow([
+          "id",
+          "registrationId",
+          "name",
+          "phone",
+          "sessionDate",
+          "isWalkin",
+          "checkedInAt"
+        ]);
+        attSheet.getRange("A1:G1").setFontWeight("bold");
+      }
+
+      var attRange = attSheet.getDataRange();
+      var attValues = attRange.getValues();
+      var targetRegId = (contents.registrationId || "").toString().trim();
+      var targetName = (contents.name || "").toString().trim().toLowerCase();
+      var targetDate = (contents.sessionDate || contents.day || "26th September, 2026").toString().trim();
+
+      for (var ai = 1; ai < attValues.length; ai++) {
+        var rowDate = attValues[ai][4] ? attValues[ai][4].toString().trim() : "";
+        if (rowDate && targetDate && rowDate !== targetDate) continue;
+
+        var rowRegId = attValues[ai][1] ? attValues[ai][1].toString().trim() : "";
+        var rowName  = attValues[ai][2] ? attValues[ai][2].toString().trim().toLowerCase() : "";
+        var isMatch = targetRegId ? (rowRegId === targetRegId) : (rowName === targetName);
+
+        if (isMatch) {
+          return responseJSON({ status: 'SUCCESS', message: 'Attendance already recorded', id: contents.id });
+        }
+      }
+
+      attSheet.appendRow([
+        contents.id || ("WATT-" + Math.floor(100000 + Math.random() * 900000)),
+        contents.registrationId || "",
+        contents.name || "",
+        contents.phone || "",
+        targetDate,
+        contents.isWalkin ? "Yes" : "No",
+        contents.checkedInAt || new Date().toISOString()
+      ]);
+
+      return responseJSON({ status: 'SUCCESS', message: 'Attendance recorded', id: contents.id });
+    }
+
+    // ── Handle Delete Attendance ──
+    if (contents.action === "deleteAttendance" && contents.id) {
+      var attSheet = getOrCreateSheet("Attendance");
+      var dAttValues = attSheet.getDataRange().getValues();
+      for (var dai = 1; dai < dAttValues.length; dai++) {
+        if (dAttValues[dai][0].toString().trim() === contents.id.toString().trim()) {
+          attSheet.deleteRow(dai + 1);
+          return responseJSON({ status: 'SUCCESS', message: 'Attendance deleted' });
+        }
+      }
+      return responseJSON({ status: 'ERROR', message: 'Attendance ID not found' });
+    }
+
+    // ── Pre-Registrations Sheet ──
     var sheet = getOrCreateSheet("Registrations");
 
     // Ensure headers exist
@@ -67,6 +157,7 @@ function doPost(e) {
         "referral",
         "prayerRequest"
       ]);
+      sheet.getRange("A1:O1").setFontWeight("bold");
     }
 
     // Delete action

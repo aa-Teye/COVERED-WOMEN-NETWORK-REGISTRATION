@@ -5,6 +5,7 @@ import Landing from './pages/Landing';
 import Register from './pages/Register';
 import Social from './pages/Social';
 import Admin from './pages/Admin';
+import Attendance from './pages/Attendance';
 import { GOOGLE_SHEET_SCRIPT_URL, STORAGE_KEY, getRegistrations } from './data/eventData';
 
 const NAV = [
@@ -32,16 +33,16 @@ function BottomNav() {
 
 function AppLayout() {
   const { pathname } = useLocation();
-  const isAdmin = pathname === '/admin';
+  const isFullPage = pathname === '/admin' || pathname === '/attendance';
 
   useEffect(() => {
-    if (isAdmin) {
+    if (isFullPage) {
       document.body.classList.add('admin-page');
     } else {
       document.body.classList.remove('admin-page');
     }
     return () => document.body.classList.remove('admin-page');
-  }, [isAdmin]);
+  }, [isFullPage]);
 
   // Silent auto-sync for offline/unsynced registrations
   useEffect(() => {
@@ -79,13 +80,14 @@ function AppLayout() {
   return (
     <>
       <Routes>
-        <Route path="/"         element={<Landing />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/connect"  element={<Social />} />
-        <Route path="/admin"    element={<Admin />} />
-        <Route path="*"         element={<Landing />} />
+        <Route path="/"           element={<Landing />} />
+        <Route path="/register"   element={<Register />} />
+        <Route path="/connect"    element={<Social />} />
+        <Route path="/admin"      element={<Admin />} />
+        <Route path="/attendance" element={<Attendance />} />
+        <Route path="*"           element={<Landing />} />
       </Routes>
-      {!isAdmin && <BottomNav />}
+      {!isFullPage && <BottomNav />}
     </>
   );
 }

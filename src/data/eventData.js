@@ -166,3 +166,172 @@ export const exportToCSV = (registrations) => {
   );
   return [headers.join(","), ...rows].join("\n");
 };
+
+// ══════════════════════════════════════════════════════
+//  ATTENDANCE & CHECK-IN STORE
+// ══════════════════════════════════════════════════════
+
+export const ATTENDANCE_STORAGE_KEY = "womens_prophetic_gathering_attendance";
+
+export const getAttendance = () => {
+  try {
+    const data = localStorage.getItem(ATTENDANCE_STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch {
+    return [];
+  }
+};
+
+export const overwriteAttendanceFromRemote = (records) => {
+  try {
+    localStorage.setItem(ATTENDANCE_STORAGE_KEY, JSON.stringify(records));
+  } catch (_) {}
+};
+
+/**
+ * Mark a woman attendee present / walk-in for the gathering.
+ * Mimics Faith Convention markAttendance.
+ */
+export const markAttendance = ({ registrationId, name, phone, sessionDate = "26th September, 2026", isWalkin = false }) => {
+  const existing = getAttendance();
+
+  // Prevent duplicate marking
+  const trimmedName = (name || '').trim().toLowerCase();
+  const alreadyMarked = existing.find(a =>
+    (a.sessionDate === sessionDate) && (
+      (registrationId && a.registrationId === registrationId) ||
+      (!registrationId && a.name.toLowerCase() === trimmedName)
+    )
+  );
+
+  if (alreadyMarked) {
+    return { duplicate: true, record: alreadyMarked };
+  }
+
+  const record = {
+    id: "WATT-" + Math.floor(100000 + Math.random() * 900000),
+    registrationId: registrationId || null,
+    name: name ? name.trim() : "Unknown",
+    phone: phone || "",
+    sessionDate,
+    isWalkin,
+    checkedInAt: new Date().toISOString(),
+    synced: false,
+  };
+
+  const updated = [...existing, record];
+  localStorage.setItem(ATTENDANCE_STORAGE_KEY, JSON.stringify(updated));
+
+  const payload = { action: "attendance", ...record };
+  const payloadStr = JSON.stringify(payload);
+
+  // 1. Sync to dedicated Women's Google Sheet
+  if (GOOGLE_SHEET_SCRIPT_URL) {
+    fetch(GOOGLE_SHEET_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: payloadStr,
+    })
+      .then(() => {
+        try {
+          const current = getAttendance();
+          const synced = current.map(a => a.id === record.id ? { ...a, synced: true } : a);
+          localStorage.setItem(ATTENDANCE_STORAGE_KEY, JSON.stringify(synced));
+        } catch (_) {}
+      })
+      .catch(err => console.error("Women's Attendance sync failed:", err));
+  }
+
+  // 2. Dual-sync to Master Church Sheet
+  if (MASTER_GOOGLE_SHEET_SCRIPT_URL && MASTER_GOOGLE_SHEET_SCRIPT_URL !== GOOGLE_SHEET_SCRIPT_URL) {
+    fetch(MASTER_GOOGLE_SHEET_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "womensAttendance", ...record }),
+    }).catch(err => console.error("Master attendance sync failed:", err));
+  }
+
+  return { duplicate: false, record };
+};
+
+/**
+ * Fetch all attendance records from Google Sheet
+ */
+export const fetchAttendanceFromSheet = async (username, password) => {
+  if (!GOOGLE_SHEET_SCRIPT_URL) {
+    return { source: "local", data: getAttendance() };
+  }
+  try {
+    const authUser = (username === "2500" || username === "admin") ? username : "admin";
+    const authPass = password || "admin123";
+    const url = `${GOOGLE_SHEET_SCRIPT_URL}?action=getAttendance&username=${encodeURIComponent(authUser)}&password=${encodeURIComponent(authPass)}`;
+    const res = await fetch(url, { method: "GET" });
+    const json = await res.json();
+    if (json.status === "SUCCESS" && Array.isArray(json.attendance)) {
+      return { source: "remote", data: json.attendance };
+    }
+    return { source: "local", data: getAttendance() };
+  } catch (err) {
+    console.error("Attendance fetch error:", err);
+    return { source: "local", data: getAttendance() };
+  }
+};
+
+/**
+ * Export attendance records to CSV
+ */
+export const exportAttendanceToCSV = (records) => {
+  if (!records.length) return "";
+  const headers = ["id", "registrationId", "name", "phone", "sessionDate", "isWalkin", "checkedInAt"];
+  const rows = records.map(r =>
+    headers.map(h => `"${(r[h] !== undefined ? String(r[h]) : "").replace(/"/g, '""')}"`).join(",")
+  );
+  return [headers.join(","), ...rows].join("\n");
+};
+
+/**
+ * Delete single attendance record locally and remotely
+ */
+export const deleteAttendanceRecord = (id) => {
+  const existing = getAttendance();
+  const updated = existing.filter(a => a.id !== id);
+  localStorage.setItem(ATTENDANCE_STORAGE_KEY, JSON.stringify(updated));
+
+  if (GOOGLE_SHEET_SCRIPT_URL) {
+    fetch(GOOGLE_SHEET_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "deleteAttendance", id }),
+    }).catch(() => {});
+  }
+  return updated;
+};
+
+/**
+ * Quick walk-in registration on site at the door
+ */
+export const saveWalkinRegistration = ({ fullName, phone = "", email = "", memberStatus = "Visitor", location = "", prayerRequest = "" }) => {
+  const regRecord = saveRegistration({
+    fullName,
+    phone,
+    email,
+    attendanceMode: "In-Person",
+    memberStatus,
+    location,
+    prayerRequest,
+    isWalkin: true,
+  });
+
+  const attResult = markAttendance({
+    registrationId: regRecord.id,
+    name: fullName,
+    phone,
+    isWalkin: true,
+  });
+
+  return { registration: regRecord, attendance: attResult.record };
+};
+

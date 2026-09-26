@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, LogIn, Download, Trash2, RefreshCw, Loader2 } from 'lucide-react';
+import { ChevronLeft, LogIn, Download, Trash2, RefreshCw, Loader2, UserCheck } from 'lucide-react';
 import { fetchRemoteRegistrations, deleteLocalRegistration, exportToCSV, GOOGLE_SHEET_SCRIPT_URL } from '../data/eventData';
 
 export default function Admin() {
@@ -106,7 +106,10 @@ export default function Admin() {
               <h1 style={{ fontSize: 18, fontWeight: 800, color: 'var(--white)', margin: 0 }}>Women's Prophetic Gathering</h1>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 10 }}>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            <button onClick={() => nav('/attendance')} className="btn btn-purple btn-sm" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <UserCheck size={13} /> Open Usher Check-In
+            </button>
             <button onClick={refresh} disabled={loading} className="btn btn-outline btn-sm" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <RefreshCw size={13} style={{ animation: loading ? 'spin 1s linear infinite' : 'none' }} /> Refresh
             </button>
